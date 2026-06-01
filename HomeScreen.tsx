@@ -1,252 +1,93 @@
-"use client"
+import { useParams, useNavigate } from 'react-router-dom';
+import { ChevronLeft, MessageSquare, Sparkles, ThumbsUp, ThumbsDown, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react';
+import { useAISystems } from '@/contexts/AISystemContext';
+import { useSettings } from '@/contexts/SettingsContext';
 
-import * as React from "react"
-import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
+export default function ConversationDetailScreen() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { getConversation } = useAISystems();
+  const { getPrimaryColor } = useSettings();
+  const primary = getPrimaryColor();
+  const conv = getConversation(id || '');
+  const [expandedReasoning, setExpandedReasoning] = useState<string | null>(null);
 
-import { cn } from "@/lib/utils"
+  if (!conv) {
+    return (
+      <div className="min-h-screen bg-parchment dark:bg-espresso-deep flex flex-col items-center justify-center px-8">
+        <MessageSquare size={48} className="text-clay/30 mb-4" />
+        <p className="text-body-sm text-clay">Conversation not found</p>
+        <button onClick={() => navigate('/ai/conversations')} className="mt-4 px-6 py-2 rounded-full text-white text-body-sm" style={{ backgroundColor: primary }}>
+          Back to Conversations
+        </button>
+      </div>
+    );
+  }
 
-function ContextMenu({
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Root>) {
-  return <ContextMenuPrimitive.Root data-slot="context-menu" {...props} />
-}
+  const formatDate = (iso: string) => {
+    const d = new Date(iso);
+    return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
 
-function ContextMenuTrigger({
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Trigger>) {
   return (
-    <ContextMenuPrimitive.Trigger data-slot="context-menu-trigger" {...props} />
-  )
-}
+    <div className="min-h-screen bg-parchment dark:bg-espresso-deep">
+      <header className="sticky top-0 z-40 bg-parchment/90 dark:bg-espresso-deep/90 backdrop-blur-md px-6 pt-6 pb-3">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/ai/conversations')} className="p-2 -ml-2"><ChevronLeft size={24} className="text-charcoal dark:text-cream-soft" /></button>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-display-sm text-charcoal dark:text-cream-soft truncate">{conv.title}</h1>
+            <p className="text-caption text-clay">{formatDate(conv.createdAt)} - {conv.messageCount} messages</p>
+          </div>
+        </div>
+      </header>
 
-function ContextMenuGroup({
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Group>) {
-  return (
-    <ContextMenuPrimitive.Group data-slot="context-menu-group" {...props} />
-  )
-}
-
-function ContextMenuPortal({
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Portal>) {
-  return (
-    <ContextMenuPrimitive.Portal data-slot="context-menu-portal" {...props} />
-  )
-}
-
-function ContextMenuSub({
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Sub>) {
-  return <ContextMenuPrimitive.Sub data-slot="context-menu-sub" {...props} />
-}
-
-function ContextMenuRadioGroup({
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.RadioGroup>) {
-  return (
-    <ContextMenuPrimitive.RadioGroup
-      data-slot="context-menu-radio-group"
-      {...props}
-    />
-  )
-}
-
-function ContextMenuSubTrigger({
-  className,
-  inset,
-  children,
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.SubTrigger> & {
-  inset?: boolean
-}) {
-  return (
-    <ContextMenuPrimitive.SubTrigger
-      data-slot="context-menu-sub-trigger"
-      data-inset={inset}
-      className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <ChevronRightIcon className="ml-auto" />
-    </ContextMenuPrimitive.SubTrigger>
-  )
-}
-
-function ContextMenuSubContent({
-  className,
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.SubContent>) {
-  return (
-    <ContextMenuPrimitive.SubContent
-      data-slot="context-menu-sub-content"
-      className={cn(
-        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-context-menu-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function ContextMenuContent({
-  className,
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Content>) {
-  return (
-    <ContextMenuPrimitive.Portal>
-      <ContextMenuPrimitive.Content
-        data-slot="context-menu-content"
-        className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-context-menu-content-available-height) min-w-[8rem] origin-(--radix-context-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
-          className
-        )}
-        {...props}
-      />
-    </ContextMenuPrimitive.Portal>
-  )
-}
-
-function ContextMenuItem({
-  className,
-  inset,
-  variant = "default",
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Item> & {
-  inset?: boolean
-  variant?: "default" | "destructive"
-}) {
-  return (
-    <ContextMenuPrimitive.Item
-      data-slot="context-menu-item"
-      data-inset={inset}
-      data-variant={variant}
-      className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function ContextMenuCheckboxItem({
-  className,
-  children,
-  checked,
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.CheckboxItem>) {
-  return (
-    <ContextMenuPrimitive.CheckboxItem
-      data-slot="context-menu-checkbox-item"
-      className={cn(
-        "focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      )}
-      checked={checked}
-      {...props}
-    >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <ContextMenuPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
-        </ContextMenuPrimitive.ItemIndicator>
-      </span>
-      {children}
-    </ContextMenuPrimitive.CheckboxItem>
-  )
-}
-
-function ContextMenuRadioItem({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.RadioItem>) {
-  return (
-    <ContextMenuPrimitive.RadioItem
-      data-slot="context-menu-radio-item"
-      className={cn(
-        "focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      )}
-      {...props}
-    >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <ContextMenuPrimitive.ItemIndicator>
-          <CircleIcon className="size-2 fill-current" />
-        </ContextMenuPrimitive.ItemIndicator>
-      </span>
-      {children}
-    </ContextMenuPrimitive.RadioItem>
-  )
-}
-
-function ContextMenuLabel({
-  className,
-  inset,
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Label> & {
-  inset?: boolean
-}) {
-  return (
-    <ContextMenuPrimitive.Label
-      data-slot="context-menu-label"
-      data-inset={inset}
-      className={cn(
-        "text-foreground px-2 py-1.5 text-sm font-medium data-[inset]:pl-8",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function ContextMenuSeparator({
-  className,
-  ...props
-}: React.ComponentProps<typeof ContextMenuPrimitive.Separator>) {
-  return (
-    <ContextMenuPrimitive.Separator
-      data-slot="context-menu-separator"
-      className={cn("bg-border -mx-1 my-1 h-px", className)}
-      {...props}
-    />
-  )
-}
-
-function ContextMenuShortcut({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
-  return (
-    <span
-      data-slot="context-menu-shortcut"
-      className={cn(
-        "text-muted-foreground ml-auto text-xs tracking-widest",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-export {
-  ContextMenu,
-  ContextMenuTrigger,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuCheckboxItem,
-  ContextMenuRadioItem,
-  ContextMenuLabel,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuGroup,
-  ContextMenuPortal,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-  ContextMenuRadioGroup,
+      <div className="px-5 py-6 space-y-6">
+        {conv.messages.map((msg) => (
+          <div key={msg.id}>
+            {msg.role === 'ai' ? (
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: `${primary}15` }}>
+                  <Sparkles size={18} style={{ color: primary }} />
+                </div>
+                <div className="flex-1 max-w-[85%]">
+                  <div className="bg-cream-soft dark:bg-white/5 rounded-2xl rounded-tl-sm px-4 py-3">
+                    <p className="text-body text-warm-stone dark:text-cream-soft/80 leading-relaxed">{msg.content}</p>
+                  </div>
+                  {msg.confidence && (
+                    <div className="mt-2 px-1">
+                      <button onClick={() => setExpandedReasoning(expandedReasoning === msg.id ? null : msg.id)}
+                        className="flex items-center gap-2 text-caption hover:opacity-70 transition-opacity" style={{ color: primary }}>
+                        <ShieldCheck size={12} />
+                        <span>{msg.confidence}% confidence</span>
+                        {msg.moodContext && <span className="text-clay">- {msg.moodContext}</span>}
+                        {expandedReasoning === msg.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                      </button>
+                      {expandedReasoning === msg.id && msg.reasoning && (
+                        <div className="mt-2 p-3 rounded-lg bg-clay/5 dark:bg-white/5">
+                          <p className="text-caption text-clay">{msg.reasoning}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 mt-1 px-1">
+                    <span className={`text-caption ${msg.feedback === 'up' ? 'text-emerald-500' : 'text-clay'}`}><ThumbsUp size={12} /></span>
+                    <span className={`text-caption ${msg.feedback === 'down' ? 'text-red-500' : 'text-clay'}`}><ThumbsDown size={12} /></span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <div className="max-w-[80%]">
+                  <div className="rounded-2xl rounded-tr-sm px-4 py-3 text-white" style={{ backgroundColor: primary }}>
+                    <p className="text-body">{msg.content}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

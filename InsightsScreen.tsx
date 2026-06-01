@@ -1,150 +1,229 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import {
+  MessageCircle, HeartHandshake, BarChart3, Users,
+  Lightbulb, TrendingUp, BrainCircuit, Sparkles,
+  ChevronRight, Zap, AlertTriangle,
+} from 'lucide-react';
+import { useAISystems } from '@/contexts/AISystemContext';
+import { useApp } from '@/contexts/AppContext';
+import { useSettings } from '@/contexts/SettingsContext';
 
-@layer base {
-  :root {
-    --background: 40 24% 94%;
-    --foreground: 0 0% 10%;
-    --card: 40 33% 96%;
-    --card-foreground: 0 0% 10%;
-    --popover: 40 33% 96%;
-    --popover-foreground: 0 0% 10%;
-    --primary: 20 64% 47%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 30 14% 67%;
-    --secondary-foreground: 0 0% 10%;
-    --muted: 30 14% 67%;
-    --muted-foreground: 25 8% 40%;
-    --accent: 40 33% 96%;
-    --accent-foreground: 0 0% 10%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 30 14% 80%;
-    --input: 30 14% 80%;
-    --ring: 20 64% 47%;
-    --radius: 0.75rem;
-
-    --color-parchment: #F5F0E8;
-    --color-charcoal: #1A1A1A;
-    --color-burnt-orange: #C45D2B;
-    --color-muted-clay: #B8A89A;
-    --color-warm-stone: #3D3833;
-    --color-soft-cream: #FAF7F2;
-    --color-deep-espresso: #2C2825;
-    --color-sage-mist: #A8B5A0;
-    --color-dusty-rose: #C9A9A6;
-  }
-
-  .dark {
-    --background: 30 8% 16%;
-    --foreground: 40 24% 94%;
-    --card: 30 8% 20%;
-    --card-foreground: 40 24% 94%;
-    --popover: 30 8% 20%;
-    --popover-foreground: 40 24% 94%;
-    --primary: 20 64% 47%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 30 8% 25%;
-    --secondary-foreground: 40 24% 94%;
-    --muted: 30 8% 25%;
-    --muted-foreground: 30 14% 60%;
-    --accent: 30 8% 25%;
-    --accent-foreground: 40 24% 94%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 30 8% 25%;
-    --input: 30 8% 25%;
-    --ring: 20 64% 47%;
-  }
+interface HubCard {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  color: string;
+  route: string;
+  alert?: boolean;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-parchment text-charcoal font-body antialiased;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  html {
-    scroll-behavior: smooth;
-  }
-}
+export default function AIHubScreen() {
+  const navigate = useNavigate();
+  const { partner } = useApp();
+  const { evergreenMetrics, partnerDynamic, getUnreadAlerts, getActiveRecommendations } = useAISystems();
+  const { getPrimaryColor } = useSettings();
+  const primary = getPrimaryColor();
 
-@layer utilities {
-  .text-display-xl {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 48px;
-    font-weight: 400;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-  }
-  .text-display-lg {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 36px;
-    font-weight: 400;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-  }
-  .text-display-md {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 28px;
-    font-weight: 400;
-    line-height: 1.2;
-  }
-  .text-display-sm {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 22px;
-    font-weight: 600;
-    line-height: 1.25;
-  }
-  .text-body-lg {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 18px;
-    font-weight: 400;
-    line-height: 1.6;
-  }
-  .text-body {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 1.6;
-  }
-  .text-body-sm {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.5;
-  }
-  .text-caption {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.4;
-    letter-spacing: 0.04em;
-  }
-  .text-label {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    line-height: 1.3;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .safe-top {
-    padding-top: env(safe-area-inset-top, 0px);
-  }
-  .safe-bottom {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
+  const unreadAlerts = getUnreadAlerts();
+  const activeRecs = getActiveRecommendations();
+
+  const cards: HubCard[] = [
+    {
+      id: 'coach',
+      title: 'Relationship Coach',
+      subtitle: 'AI support for your relationship',
+      icon: <MessageCircle size={22} />,
+      color: '#E11D48',
+      route: '/ai/coach',
+    },
+    {
+      id: 'analysis',
+      title: 'Relationship Analysis',
+      subtitle: 'Health predictions & patterns',
+      icon: <BarChart3 size={22} />,
+      color: '#3B82F6',
+      route: '/ai/analysis',
+      alert: unreadAlerts.length > 0,
+    },
+    {
+      id: 'conflict',
+      title: 'Conflict Resolution',
+      subtitle: 'De-escalation & repair guidance',
+      icon: <HeartHandshake size={22} />,
+      color: '#F59E0B',
+      route: '/ai/conflict',
+    },
+    {
+      id: 'content',
+      title: 'Couple Activities',
+      subtitle: 'Date ideas, prompts & exercises',
+      icon: <Lightbulb size={22} />,
+      color: '#8B5CF6',
+      route: '/ai/content',
+    },
+    {
+      id: 'recommendations',
+      title: 'Smart Suggestions',
+      subtitle: 'Context-aware for couples',
+      icon: <TrendingUp size={22} />,
+      color: '#10B981',
+      route: '/ai/recommendations',
+      alert: activeRecs.length > 0,
+    },
+    {
+      id: 'evergreen',
+      title: 'Evergreen Intelligence',
+      subtitle: 'AI learning & performance',
+      icon: <BrainCircuit size={22} />,
+      color: '#06B6D4',
+      route: '/ai/evergreen',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-parchment dark:bg-espresso-deep">
+      <header className="sticky top-0 z-40 bg-parchment/90 dark:bg-espresso-deep/90 backdrop-blur-md px-6 pt-6 pb-3">
+        <h1 className="text-display-lg text-charcoal dark:text-cream-soft">Aevum Hub</h1>
+        <p className="text-body-sm text-clay mt-1">Your relationship space</p>
+      </header>
+
+      <div className="px-5 pb-8 space-y-5">
+        {/* Partner status */}
+        {partner?.connected ? (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            className="bg-charcoal rounded-2xl p-5">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-body-sm font-medium" style={{ background: `linear-gradient(135deg, ${primary} 0%, #A855F7 100%)` }}>
+                {partner.name?.[0] || 'P'}
+              </div>
+              <div>
+                <p className="text-body-sm font-medium text-white">{partner.name || 'Your Partner'}</p>
+                <p className="text-caption text-white/50">Connected - {partner.lastCheckIn || 'Active'}</p>
+              </div>
+            </div>
+            <button onClick={() => navigate('/partner')}
+              className="w-full h-[40px] rounded-full text-white text-body-sm font-medium border border-white/20 hover:bg-white/10 transition-colors">
+              Manage Connection
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            className="bg-charcoal rounded-2xl p-5 text-center">
+            <Users size={24} className="text-white/50 mx-auto mb-2" />
+            <p className="text-body-sm text-white/70 mb-3">Connect with your partner to unlock relationship features</p>
+            <button onClick={() => navigate('/partner')}
+              className="h-[40px] px-6 rounded-full text-white text-body-sm font-medium" style={{ backgroundColor: primary }}>
+              Link Partner
+            </button>
+          </motion.div>
+        )}
+
+        {/* Status banner */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+          className="bg-cream-soft dark:bg-white/5 rounded-2xl p-5 shadow-card">
+          <div className="flex items-center gap-3 mb-3">
+            <Sparkles size={16} style={{ color: primary }} />
+            <p className="text-body-sm font-medium text-charcoal dark:text-cream-soft">Evergreen Active</p>
+          </div>
+          <div className="grid grid-cols-4 gap-3">
+            {[
+              { label: 'Accuracy', value: `${evergreenMetrics.accuracyScore}%` },
+              { label: 'Personal', value: `${evergreenMetrics.personalizationScore}%` },
+              { label: 'Emotion', value: `${evergreenMetrics.emotionalUnderstanding}%` },
+              { label: 'Satisfaction', value: `${evergreenMetrics.responseSatisfaction}%` },
+            ].map(m => (
+              <div key={m.label} className="bg-parchment dark:bg-white/5 rounded-lg p-2 text-center">
+                <p className="text-body-sm font-medium text-charcoal dark:text-cream-soft">{m.value}</p>
+                <p className="text-caption text-clay">{m.label}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Partner Dynamic */}
+        {partnerDynamic && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="bg-cream-soft dark:bg-white/5 rounded-2xl p-5 shadow-card">
+            <div className="flex items-center gap-2 mb-3">
+              <Zap size={16} style={{ color: primary }} />
+              <p className="text-caption font-medium text-charcoal dark:text-cream-soft">Partner Dynamic</p>
+            </div>
+            <p className="text-body-sm text-warm-stone dark:text-cream-soft/70 capitalize mb-3">
+              {partnerDynamic.pursuerWithdrawerPattern.replace(/_/g, ' ')} pattern
+            </p>
+            <div className="space-y-2">
+              {[
+                { label: 'Emotional Sync', value: partnerDynamic.emotionalSynchronization },
+                { label: 'Communication', value: partnerDynamic.communicationBalance },
+                { label: 'Attachment Match', value: 100 - partnerDynamic.attachmentMismatch },
+              ].map(s => (
+                <div key={s.label} className="flex items-center gap-2">
+                  <span className="text-caption text-clay w-28">{s.label}</span>
+                  <div className="flex-1 h-1.5 bg-clay/15 rounded-full overflow-hidden">
+                    <motion.div className="h-full rounded-full bg-primary"
+                      initial={{ width: 0 }} animate={{ width: `${s.value}%` }} transition={{ duration: 0.8 }} />
+                  </div>
+                  <span className="text-caption text-clay w-8 text-right">{s.value}%</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Alerts */}
+        {unreadAlerts.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="space-y-2">
+            {unreadAlerts.slice(0, 2).map(alert => (
+              <button key={alert.id} onClick={() => navigate('/ai/analysis')}
+                className={`w-full text-left rounded-xl p-4 ${
+                  alert.severity === 'critical' ? 'bg-red-50 dark:bg-red-900/10 border border-red-200' :
+                  alert.severity === 'warning' ? 'bg-amber-50 dark:bg-amber-900/10 border border-amber-200' :
+                  'bg-emerald-50 dark:bg-emerald-900/10'
+                }`}>
+                <div className="flex items-start gap-3">
+                  <AlertTriangle size={16} className={`mt-0.5 flex-shrink-0 ${
+                    alert.severity === 'critical' ? 'text-red-500' : alert.severity === 'warning' ? 'text-amber-500' : 'text-emerald-500'
+                  }`} />
+                  <div>
+                    <p className="text-body-sm font-medium text-charcoal dark:text-cream-soft">{alert.title}</p>
+                    <p className="text-caption text-clay mt-0.5">{alert.description}</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Cards */}
+        <div className="space-y-3">
+          {cards.map((card, i) => (
+            <motion.button key={card.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.05 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => navigate(card.route)}
+              className="w-full text-left bg-cream-soft dark:bg-white/5 rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center relative" style={{ backgroundColor: `${card.color}15` }}>
+                  <span style={{ color: card.color }}>{card.icon}</span>
+                  {card.alert && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-primary border-2 border-cream-soft dark:border-espresso-deep" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-body font-medium text-charcoal dark:text-cream-soft">{card.title}</h3>
+                    {card.alert && <span className="w-2 h-2 rounded-full bg-primary" />}
+                  </div>
+                  <p className="text-caption text-clay">{card.subtitle}</p>
+                </div>
+                <ChevronRight size={18} className="text-clay/40 flex-shrink-0" />
+              </div>
+            </motion.button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }

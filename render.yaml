@@ -1,0 +1,33 @@
+# Render.com Blueprint for Aevum
+# This file auto-configures your Render deployment
+# See: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: aevum
+    runtime: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/trpc/ping
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false  # Set this manually in Render dashboard
+      - key: OPENAI_API_KEY
+        sync: false  # Set this manually in Render dashboard
+      - key: APP_SECRET
+        generateValue: true
+      - key: APP_ID
+        sync: false
+      - key: VITE_APP_ID
+        sync: false
+      - key: VITE_KIMI_AUTH_URL
+        sync: false
+      - key: KIMI_AUTH_URL
+        sync: false
+      - key: KIMI_OPEN_URL
+        sync: false
+      - key: OWNER_UNION_ID
+        sync: false

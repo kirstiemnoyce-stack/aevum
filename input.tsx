@@ -1,39 +1,44 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useApp } from './contexts/AppContext';
-import BottomNav from './components/BottomNav';
-import LoginScreen from './pages/LoginScreen';
-import HomeScreen from './pages/HomeScreen';
-import CheckInScreen from './pages/CheckInScreen';
-import PartnerHubScreen from './pages/PartnerHubScreen';
-import ChatScreen from './pages/ChatScreen';
-import InsightsScreen from './pages/InsightsScreen';
-import FeedScreen from './pages/FeedScreen';
-import ProfileScreen from './pages/ProfileScreen';
+"use client"
 
-export default function App() {
-  const { user } = useApp();
-  const location = useLocation();
-  const isLogin = location.pathname === '/login';
+import * as React from "react"
+import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 
-  if (!user && !isLogin) {
-    return <Navigate to="/login" replace />;
-  }
+import { cn } from "@/lib/utils"
 
-  return (
-    <div className="min-h-screen bg-parchment dark:bg-espresso-deep transition-colors duration-300">
-      <main className="pb-28">
-        <Routes>
-          <Route path="/login" element={<LoginScreen />} />
-          <Route path="/" element={<HomeScreen />} />
-          <Route path="/checkin" element={<CheckInScreen />} />
-          <Route path="/partner" element={<PartnerHubScreen />} />
-          <Route path="/chat" element={<ChatScreen />} />
-          <Route path="/insights" element={<InsightsScreen />} />
-          <Route path="/feed" element={<FeedScreen />} />
-          <Route path="/profile" element={<ProfileScreen />} />
-        </Routes>
-      </main>
-      {user && <BottomNav />}
-    </div>
-  );
+function HoverCard({
+  ...props
+}: React.ComponentProps<typeof HoverCardPrimitive.Root>) {
+  return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />
 }
+
+function HoverCardTrigger({
+  ...props
+}: React.ComponentProps<typeof HoverCardPrimitive.Trigger>) {
+  return (
+    <HoverCardPrimitive.Trigger data-slot="hover-card-trigger" {...props} />
+  )
+}
+
+function HoverCardContent({
+  className,
+  align = "center",
+  sideOffset = 4,
+  ...props
+}: React.ComponentProps<typeof HoverCardPrimitive.Content>) {
+  return (
+    <HoverCardPrimitive.Portal data-slot="hover-card-portal">
+      <HoverCardPrimitive.Content
+        data-slot="hover-card-content"
+        align={align}
+        sideOffset={sideOffset}
+        className={cn(
+          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-64 origin-(--radix-hover-card-content-transform-origin) rounded-md border p-4 shadow-md outline-hidden",
+          className
+        )}
+        {...props}
+      />
+    </HoverCardPrimitive.Portal>
+  )
+}
+
+export { HoverCard, HoverCardTrigger, HoverCardContent }

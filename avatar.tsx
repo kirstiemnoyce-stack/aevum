@@ -1,114 +1,64 @@
-import * as React from "react"
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Check, AlertTriangle, X } from 'lucide-react';
 
-import { cn } from "@/lib/utils"
-
-function Table({ className, ...props }: React.ComponentProps<"table">) {
-  return (
-    <div
-      data-slot="table-container"
-      className="relative w-full overflow-x-auto"
-    >
-      <table
-        data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
-    </div>
-  )
+interface ToastProps {
+  message: string;
+  type?: 'success' | 'error' | 'info';
+  visible: boolean;
+  onClose: () => void;
+  duration?: number;
 }
 
-function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
-  return (
-    <thead
-      data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
-      {...props}
-    />
-  )
-}
+export default function Toast({ message, type = 'success', visible, onClose, duration = 3000 }: ToastProps) {
+  const [progress, setProgress] = useState(100);
 
-function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
-  return (
-    <tbody
-      data-slot="table-body"
-      className={cn("[&_tr:last-child]:border-0", className)}
-      {...props}
-    />
-  )
-}
+  useEffect(() => {
+    if (!visible) return;
+    setProgress(100);
+    const timer = setTimeout(onClose, duration);
+    const interval = setInterval(() => {
+      setProgress(p => Math.max(0, p - 100 / (duration / 50)));
+    }, 50);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [visible, onClose, duration]);
 
-function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
+  const icon = type === 'success' ? <Check size={16} /> : type === 'error' ? <AlertTriangle size={16} /> : <Check size={16} />;
+  const iconColor = type === 'success' ? '#10B981' : type === 'error' ? '#A855F7' : 'var(--app-primary, #6366F1)';
+
   return (
-    <tfoot
-      data-slot="table-footer"
-      className={cn(
-        "bg-muted/50 border-t font-medium [&>tr]:last:border-b-0",
-        className
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="fixed bottom-24 left-4 right-4 z-[60] flex justify-center"
+        >
+          <div
+            className="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg max-w-sm w-full"
+            style={{ backgroundColor: '#0F172A' }}
+          >
+            <span style={{ color: iconColor }}>{icon}</span>
+            <p className="flex-1 text-body-sm text-white">{message}</p>
+            <button onClick={onClose} className="opacity-60 hover:opacity-100 transition-opacity">
+              <X size={16} className="text-white" />
+            </button>
+            <div
+              className="absolute bottom-0 left-4 right-4 h-0.5 rounded-full transition-all"
+              style={{
+                width: `${progress}%`,
+                backgroundColor: iconColor,
+                opacity: 0.5,
+              }}
+            />
+          </div>
+        </motion.div>
       )}
-      {...props}
-    />
-  )
-}
-
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
-  return (
-    <tr
-      data-slot="table-row"
-      className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableHead({ className, ...props }: React.ComponentProps<"th">) {
-  return (
-    <th
-      data-slot="table-head"
-      className={cn(
-        "text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableCell({ className, ...props }: React.ComponentProps<"td">) {
-  return (
-    <td
-      data-slot="table-cell"
-      className={cn(
-        "p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function TableCaption({
-  className,
-  ...props
-}: React.ComponentProps<"caption">) {
-  return (
-    <caption
-      data-slot="table-caption"
-      className={cn("text-muted-foreground mt-4 text-sm", className)}
-      {...props}
-    />
-  )
-}
-
-export {
-  Table,
-  TableHeader,
-  TableBody,
-  TableFooter,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
+    </AnimatePresence>
+  );
 }

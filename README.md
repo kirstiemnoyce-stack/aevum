@@ -85,7 +85,7 @@ See `env.example` for the full list. Key variables:
 
 ## API
 
-The backend exposes a single tRPC router (see `router.ts`) mounted under
+The backend exposes a single tRPC router (see `boot.ts`) mounted under
 `/api/trpc`, with sub-routers for `auth`, `checkin`, `partner`, `feed`,
 `chat`, `psych`, `ai`, `image`, `push`, and `status`. A lightweight health
 check is available at `/api/trpc/ping`.

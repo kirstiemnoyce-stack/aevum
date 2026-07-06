@@ -4,12 +4,26 @@ import { createRouter, authedQuery, publicQuery } from "./middleware";
 import { getDb } from "./queries/connection";
 import webPush from "web-push";
 
-// Configure VAPID keys — in production, generate with:
+// Configure VAPID keys — generate a persistent pair with:
 // npx web-push generate-vapid-keys
-// For now, use a derived key pair (replace with proper keys)
-const VAPID_PUBLIC_KEY = "BEl62iJMgib5xYlgN5z7oRH_Tp2HfH8_f8J4xHvI2xL2K2Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4";
-const VAPID_PRIVATE_KEY = "aK2Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q4Q";
+// and set VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY in the environment.
+// Falls back to a freshly generated pair so the server doesn't crash when
+// they're unset, but push subscriptions won't survive a restart in that case.
 const VAPID_SUBJECT = "mailto:support@aevum.app";
+const vapidKeys =
+  process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY
+    ? { publicKey: process.env.VAPID_PUBLIC_KEY, privateKey: process.env.VAPID_PRIVATE_KEY }
+    : webPush.generateVAPIDKeys();
+
+if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+  console.warn(
+    "[push] VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY not set — generated an ephemeral pair. " +
+      "Push subscriptions will be invalidated on every restart until real keys are configured.",
+  );
+}
+
+const VAPID_PUBLIC_KEY = vapidKeys.publicKey;
+const VAPID_PRIVATE_KEY = vapidKeys.privateKey;
 
 webPush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 

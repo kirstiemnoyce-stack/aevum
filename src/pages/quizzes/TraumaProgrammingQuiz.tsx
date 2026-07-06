@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
-import QuizLayout from './QuizLayout';
+import QuizLayout from '../../components/QuizLayout';
 import { useApp } from '@/contexts/AppContext';
-import type { QuizQuestion } from './QuizLayout';
+import type { QuizQuestion } from '../../components/QuizLayout';
 
 const questions: QuizQuestion[] = [
   // Childhood emotional invalidation

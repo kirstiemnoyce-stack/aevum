@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { FlaskConical } from 'lucide-react';
-import QuizLayout from './QuizLayout';
+import QuizLayout from '../../components/QuizLayout';
 import { useApp } from '@/contexts/AppContext';
-import type { QuizQuestion } from './QuizLayout';
+import type { QuizQuestion } from '../../components/QuizLayout';
 
 const questions: QuizQuestion[] = [
   // Serotonin baseline
